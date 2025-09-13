@@ -1,0 +1,353 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Prediction Details - {{ prediction.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-white">
+                <i class="fas fa-chart-line me-3"></i>
+                Prediction Details
+            </h2>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-light">
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Prediction Summary -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Prediction Summary
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="stats-card mb-3">
+                    <div class="stats-icon text-primary">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="stats-value text-primary">
+                        {{ prediction.predicted_output|floatformat:2 }} kWh
+                    </div>
+                    <div class="stats-label">
+                        {{ prediction.timeframe|title }} Output
+                    </div>
+                </div>
+                
+                {% if prediction.confidence_score %}
+                <div class="stats-card">
+                    <div class="stats-icon text-success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stats-value text-success">
+                        {{ prediction.confidence_score|floatformat:1 }}%
+                    </div>
+                    <div class="stats-label">Confidence</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Location & Configuration -->
+    <div class="col-md-8 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-cog me-2"></i>
+                    Configuration Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-3">Location Information</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Name:</strong></td>
+                                <td>{{ prediction.location.name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Latitude:</strong></td>
+                                <td>{{ prediction.location.latitude }}°</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Longitude:</strong></td>
+                                <td>{{ prediction.location.longitude }}°</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-3">Panel Configuration</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Surface Area:</strong></td>
+                                <td>{{ prediction.panel_config.surface_area }} m²</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tilt Angle:</strong></td>
+                                <td>{{ prediction.panel_config.tilt_angle }}°</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Azimuth Angle:</strong></td>
+                                <td>{{ prediction.panel_config.azimuth_angle }}°</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Panel Efficiency:</strong></td>
+                                <td>{{ prediction.panel_config.panel_efficiency|floatformat:1 }}%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart Visualization -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-area me-2"></i>
+                    Power Output Visualization
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="powerChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<pre>{{ prediction.weather_data }}</pre>
+
+<!-- Weather Information -->
+{% if prediction.weather_data %}
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-cloud-sun me-2"></i>
+                    Weather Conditions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon text-warning">
+                                <i class="fas fa-sun"></i>
+                            </div>
+                            <div class="stats-value">
+                                {{ prediction.weather_data.solar_irradiance|floatformat:1 }}
+                            </div>
+                            <div class="stats-label">kWh/m²/day</div>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon text-danger">
+                                <i class="fas fa-thermometer-half"></i>
+                            </div>
+                            <div class="stats-value">
+                                {{ prediction.weather_data.temperature|floatformat:1 }}°C
+                            </div>
+                            <div class="stats-label">Temperature</div>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon text-info">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <div class="stats-value">
+                                {{ prediction.weather_data.humidity|floatformat:0 }}%
+                            </div>
+                            <div class="stats-label">Humidity</div>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon text-secondary">
+                                <i class="fas fa-cloud"></i>
+                            </div>
+                            <div class="stats-value">
+                                {{ prediction.weather_data.cloud_cover|floatformat:0 }}%
+                            </div>
+                            <div class="stats-label">Cloud Cover</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        Data source: {{ prediction.weather_data.source|default:"N/A" }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Report Downloads -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-download me-2"></i>
+                    Download Reports
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">Download detailed reports of this prediction in various formats.</p>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'download_report' prediction.id %}?format=pdf" class="btn btn-danger">
+                        <i class="fas fa-file-pdf me-2"></i>
+                        Download PDF Report
+                    </a>
+                    <a href="{% url 'download_report' prediction.id %}?format=csv" class="btn btn-success">
+                        <i class="fas fa-file-csv me-2"></i>
+                        Download CSV Data
+                    </a>
+                </div>
+                
+                <div class="mt-4">
+                    <small class="text-muted">
+                        <strong>PDF Report includes:</strong> Full prediction details, charts, weather data, and analysis.<br>
+                        <strong>CSV Data includes:</strong> Raw data in spreadsheet format for further analysis.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Prediction Metadata -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info me-2"></i>
+                    Prediction Metadata
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <strong>Prediction ID:</strong> {{ prediction.id }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Created:</strong> {{ prediction.created_at|date:"M d, Y H:i" }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Prediction Date:</strong> {{ prediction.prediction_date|date:"M d, Y" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Parse time series data
+    const timeSeriesData = {{ time_series_data|safe }};
+    
+    // Create chart
+    const ctx = document.getElementById('powerChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timeSeriesData.labels,
+            datasets: [{
+                label: 'Power Output (kWh)',
+                data: timeSeriesData.data,
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#2563eb',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: `Solar Power Output - ${timeSeriesData.timeframe.charAt(0).toUpperCase() + timeSeriesData.timeframe.slice(1)} Prediction`,
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    }
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Time',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        display: true,
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Power Output (kWh)',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    beginAtZero: true,
+                    grid: {
+                        display: true,
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            elements: {
+                line: {
+                    tension: 0.4
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

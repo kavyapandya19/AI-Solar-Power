@@ -1,0 +1,295 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Recommendation Details - {{ recommendation.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-white">
+                <i class="fas fa-bullseye me-3"></i>
+                Optimal Configuration Recommendation
+            </h2>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-light">
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Optimal Configuration -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-crosshairs me-2"></i>
+                    Optimal Configuration
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon text-success">
+                                <i class="fas fa-angle-up"></i>
+                            </div>
+                            <div class="stats-value text-success">
+                                {{ recommendation.optimal_tilt }}°
+                            </div>
+                            <div class="stats-label">Optimal Tilt</div>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-icon text-success">
+                                <i class="fas fa-compass"></i>
+                            </div>
+                            <div class="stats-value text-success">
+                                {{ recommendation.optimal_azimuth }}°
+                            </div>
+                            <div class="stats-label">Optimal Azimuth</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-card mt-3">
+                    <div class="stats-icon text-primary">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="stats-value text-primary">
+                        {{ recommendation.max_predicted_output|floatformat:2 }} kWh
+                    </div>
+                    <div class="stats-label">Maximum Daily Output</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Current vs Optimal Comparison -->
+    {% if recommendation.current_config and recommendation.improvement_percentage %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-balance-scale me-2"></i>
+                    Current vs Optimal
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6 text-center">
+                        <h6 class="text-muted mb-3">Current Configuration</h6>
+                        <div class="mb-3">
+                            <strong>Tilt:</strong> {{ recommendation.current_config.tilt_angle }}°<br>
+                            <strong>Azimuth:</strong> {{ recommendation.current_config.azimuth_angle }}°
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <h6 class="text-muted mb-3">Recommended Configuration</h6>
+                        <div class="mb-3">
+                            <strong>Tilt:</strong> {{ recommendation.optimal_tilt }}°<br>
+                            <strong>Azimuth:</strong> {{ recommendation.optimal_azimuth }}°
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-card">
+                    <div class="stats-icon text-success">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="stats-value text-success">
+                        +{{ recommendation.improvement_percentage|floatformat:1 }}%
+                    </div>
+                    <div class="stats-label">Improvement</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Location Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <td><strong>Location:</strong></td>
+                        <td>{{ recommendation.location.name }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Latitude:</strong></td>
+                        <td>{{ recommendation.location.latitude }}°</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Longitude:</strong></td>
+                        <td>{{ recommendation.location.longitude }}°</td>
+                    </tr>
+                </table>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <strong>Tip:</strong> To see potential improvement, include your current tilt and azimuth angles when requesting a recommendation.
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Optimization Insights -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    Optimization Insights
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <i class="fas fa-angle-up fa-2x text-success mb-3"></i>
+                                <h6>Tilt Angle Explanation</h6>
+                                <p class="text-muted small">
+                                    The optimal tilt angle ({{ recommendation.optimal_tilt }}°) is calculated based on your location's latitude
+                                    to maximize solar exposure throughout the year. This angle captures the most solar energy on average.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <i class="fas fa-compass fa-2x text-primary mb-3"></i>
+                                <h6>Azimuth Angle Explanation</h6>
+                                <p class="text-muted small">
+                                    The optimal azimuth angle ({{ recommendation.optimal_azimuth }}°) points your panels toward the sun's path.
+                                    For most locations in the Northern Hemisphere, this is typically south-facing (180°).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <i class="fas fa-chart-line fa-2x text-warning mb-3"></i>
+                                <h6>Expected Benefits</h6>
+                                <p class="text-muted small">
+                                    By adjusting to the optimal configuration, you can maximize your solar energy production
+                                    and potentially reduce your electricity costs over time.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Implementation Guide -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-tools me-2"></i>
+                    Implementation Guide
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Important Considerations
+                        </h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Consult with a certified solar installer before making adjustments
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Consider roof structure and shading from nearby objects
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Factor in local building codes and regulations
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Weather patterns and seasonal variations
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-warning mb-3">
+                            <i class="fas fa-cog me-2"></i>
+                            Next Steps
+                        </h6>
+                        <ol class="list-unstyled">
+                            <li class="mb-2">
+                                <span class="badge bg-primary me-2">1</span>
+                                Review the recommended angles with your installer
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge bg-primary me-2">2</span>
+                                Assess the feasibility of adjustment
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge bg-primary me-2">3</span>
+                                Calculate cost-benefit of the modification
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge bg-primary me-2">4</span>
+                                Schedule installation if beneficial
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recommendation Metadata -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info me-2"></i>
+                    Recommendation Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Recommendation ID:</strong> {{ recommendation.id }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Created:</strong> {{ recommendation.created_at|date:"M d, Y H:i" }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Location:</strong> {{ recommendation.location.name }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Coordinates:</strong> {{ recommendation.location.latitude }}, {{ recommendation.location.longitude }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
