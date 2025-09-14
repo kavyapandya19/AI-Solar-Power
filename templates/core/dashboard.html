@@ -226,7 +226,7 @@
         };
     }
     
-    // Location name se coordinates fetch
+    // Location name -> coordinates fetch
     async function getCoordinates(location) {
         if (!location) return null;
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`;
@@ -238,7 +238,7 @@
         return null;
     }
     
-    // Coordinates se location name fetch
+    // Coordinates -> location name fetch
     async function getLocationName(lat, lon) {
         if (!lat || !lon) return "";
         const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
@@ -252,7 +252,7 @@
     const latInput = document.getElementById("latitude");
     const lonInput = document.getElementById("longitude");
     
-    // --- Location name change hone par ---
+    // --- While writing texts  ---
     locationInput.addEventListener("input", debounce(async () => {
         const location = locationInput.value.trim();
         if (location.length > 2) {
@@ -264,7 +264,7 @@
         }
     }, 600));
     
-    // --- Latitude / Longitude change hone par ---
+    // --- while changing Latitude / Longitude ---
     async function updateLocationFromLatLon() {
         const lat = latInput.value.trim();
         const lon = lonInput.value.trim();

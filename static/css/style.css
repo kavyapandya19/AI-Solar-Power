@@ -57,40 +57,25 @@
     100% { transform: rotate(360deg); }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent; /* Changed from #f1f1f1 to transparent */
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-/* ===== Global invisible scrollbars ===== */
-
-/* For Chrome, Edge, Safari */
+/* ===== Hide Scrollbars (Cross-browser) ===== */
+/* Chrome, Edge, Safari */
 *::-webkit-scrollbar {
-  width: 8px;             /* keep small (or 0 if you want to disable) */
-  height: 8px;
-  background: transparent; /* track invisible */
+  width: 0px;
+  height: 0px;
+  background: transparent; /* track */
 }
 
 *::-webkit-scrollbar-thumb {
-  background: transparent; /* thumb invisible */
-  border-radius: 4px;
+  background: transparent; /* thumb */
 }
 
-/* For Firefox */
+/* Firefox */
 * {
-  scrollbar-width: none;   /* completely hides the scrollbar */
+  scrollbar-width: none;   /* hides scrollbar */
   scrollbar-color: transparent transparent;
+}
+
+/* Internet Explorer + old Edge */
+* {
+  -ms-overflow-style: none; /* hides scrollbar */
 }
